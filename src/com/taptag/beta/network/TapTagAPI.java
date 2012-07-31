@@ -28,12 +28,12 @@ public class TapTagAPI {
 	public static String VISITED = "/visited.json";
 	public static String PROGRESS = "/progress.json";
 	public static String JSON = "application/json";
+	public static String JSON_END = ".json";
 	
 	public static Vendor[] vendorsVisitedBy(Integer userID) {
 		URI visitedPath = pathWithID(ROOT + USERS, userID, VISITED);
 		InputStream stream = streamFrom(jsonGet(visitedPath));
 		ObjectMapper om = new ObjectMapper();
-    	//om.configure(DeserializationConfig.Feature.UNWRAP_ROOT_VALUE, true);
 		try {
 			VendorsListWrapper vlw = om.readValue(stream, VendorsListWrapper.class);
 			return vlw.getVendorArray();
@@ -54,6 +54,20 @@ public class TapTagAPI {
 		} catch (Exception e) {
 			e.printStackTrace();
 			return (new Reward[0]);
+		}
+	}
+	
+	public static Vendor vendorById(Integer vendorID) {
+		URI vendorPath = pathWithID(ROOT + VENDORS, vendorID, JSON_END);
+		InputStream stream = streamFrom(jsonGet(vendorPath));
+		ObjectMapper om = new ObjectMapper();
+		om.configure(DeserializationConfig.Feature.UNWRAP_ROOT_VALUE, true);
+		try {
+			Vendor vendor = om.readValue(stream, Vendor.class);
+			return vendor;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return (new Vendor());
 		}
 	}
 	
