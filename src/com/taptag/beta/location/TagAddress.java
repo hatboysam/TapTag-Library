@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+
 import android.content.Context;
 import android.location.Address;
 import android.location.Geocoder;
@@ -11,39 +13,51 @@ import android.location.Location;
 import android.location.LocationManager;
 
 @SuppressWarnings("serial")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class TagAddress implements Serializable {
 	
-	private String streetAddress1;
-	private String streetAddress2;
+	private String address1;
+	private String address2;
 	private String city;
 	private String state;
-	private String zip;
-	private Double[] latLong;
+	private Integer zip;
+	private LatLong coordinates;
+	
+	public TagAddress() {
+		this.address1 = "";
+		this.address2 = "";
+		this.city = "";
+		this.state = "";
+		this.zip = 00000;
+		this.coordinates = null;
+	}
 	
 	public TagAddress(String streetAddress1, String streetAddress2, String city, String state, String zip, String country) {
-		this.streetAddress1 = streetAddress1;
-		this.streetAddress2 = streetAddress2;
+		this.address1 = streetAddress1;
+		this.address2 = streetAddress2;
 		this.city = city;
 		this.state = state;
-		latLong = null;
+		this.zip = Integer.parseInt(zip);
+		this.coordinates = null;
 	}
 	
 	public TagAddress(String streetAddress1, String city, String state, String zip) {
-		this.streetAddress1 = streetAddress1;
-		this.streetAddress2 = "";
+		this.address1 = streetAddress1;
+		this.address2 = "";
 		this.city = city;
 		this.state = state;
-		this.zip = zip;
-		latLong = null;
+		this.zip = Integer.parseInt(zip);
+		this.coordinates = null;
 	}
+	
 	
 	public String toString() {
 		String result = "";
-		result += streetAddress1;
-		if (streetAddress2 != null && !streetAddress2.equals("")) {
-			result += (", " + streetAddress2);
+		result += address1;
+		if (address2 != null && !address2.equals("")) {
+			result += (", " + address2);
 		}
-		result += (", " + city + " " + state + ", " + zip);
+		result += (", " + city + " " + state + ", " + Integer.toString(zip));
 		return result;
 	}
 	
@@ -53,8 +67,8 @@ public class TagAddress implements Serializable {
 	 * @return
 	 */
 	public Double[] getLatLong(Context context) {
-		if (latLong != null) {
-			return latLong;
+		if (coordinates != null) {
+			return coordinates.toArray();
 		}
 		Geocoder code = new Geocoder(context);
 		List<Address> addresses;
@@ -63,14 +77,14 @@ public class TagAddress implements Serializable {
 
 			if(addresses.size() > 0) {
 				Address bestGuess = addresses.get(0);
-				latLong = new Double[] {bestGuess.getLatitude(), bestGuess.getLongitude()};
+				coordinates = new LatLong(bestGuess.getLatitude(), bestGuess.getLongitude());
 			} else {
-				latLong = new Double[] {0.0, 0.0};
+				coordinates = new LatLong();
 			}
 		} catch (IOException e) {
-			latLong = new Double[] {0.0, 0.0};
+			coordinates = new LatLong();
 		}
-		return latLong;
+		return coordinates.toArray();
 	}
 	
 	/**
@@ -87,5 +101,58 @@ public class TagAddress implements Serializable {
 		Location.distanceBetween (thisLatLong[0], thisLatLong[1], thatLatLong[0], thatLatLong[1], result);
 		return ((double) result[0]);
 	}
+	
+	//============================================================
+	//====================GETTERS AND SETTERS=====================
+	//============================================================
+	
+	public String getAddress1() {
+		return address1;
+	}
+
+	public void setAddress1(String address1) {
+		this.address1 = address1;
+	}
+
+	public String getAddress2() {
+		return address2;
+	}
+
+	public void setAddress2(String address2) {
+		this.address2 = address2;
+	}
+
+	public String getCity() {
+		return city;
+	}
+
+	public void setCity(String city) {
+		this.city = city;
+	}
+
+	public String getState() {
+		return state;
+	}
+
+	public void setState(String state) {
+		this.state = state;
+	}
+
+	public Integer getZip() {
+		return zip;
+	}
+
+	public void setZip(Integer zip) {
+		this.zip = zip;
+	}
+
+	public LatLong getCoordinates() {
+		return coordinates;
+	}
+
+	public void setCoordinates(LatLong coordinates) {
+		this.coordinates = coordinates;
+	}
+
 
 }

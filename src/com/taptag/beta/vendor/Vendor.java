@@ -13,7 +13,7 @@ public class Vendor implements Comparable<Vendor>, Serializable {
 	private int company_id;
 	private TagAddress address;
 
-	// //private String category;
+	//private String category;
 
 	public Vendor() {
 
