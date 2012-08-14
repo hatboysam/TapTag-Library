@@ -15,10 +15,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import org.codehaus.jackson.map.DeserializationConfig;
@@ -27,6 +24,7 @@ import org.codehaus.jackson.map.annotate.JsonRootName;
 import com.taptag.beta.facebook.FacebookUserInfo;
 import com.taptag.beta.response.UserFetchResponse;
 import com.taptag.beta.reward.Reward;
+import com.taptag.beta.tap.Tap;
 import com.taptag.beta.vendor.Vendor;
 
 public class TapTagAPI {
@@ -36,6 +34,7 @@ public class TapTagAPI {
 	public static String ROOT = "http://taptag.herokuapp.com";
 	public static String HTTPS_ROOT = "https://taptag.herokuapp.com";
 	public static String USERS = "/users";
+	public static String TAPS = "/taps";
 	public static String VENDORS = "/vendors";
 	public static String VISITED = "/visited.json";
 	public static String PROGRESS = "/progress.json";
@@ -43,6 +42,27 @@ public class TapTagAPI {
 	public static String JSON = "application/json";
 	public static String JSON_END = ".json";
 
+	public static boolean submitTap(Integer userId, Vendor vendor) {
+		Tap tap = new Tap();
+		tap.setCompanyID(vendor.getCompanyId());
+		tap.setVendorID(vendor.getId());
+		tap.setUserID(userId);
+		//Create POST
+		URI tapsPath = combinePath(HTTPS_ROOT, TAPS);
+		byte[] tapBytes = writeObjectToByteArray(new TapWrapper(tap));
+		ByteArrayEntity bae = new ByteArrayEntity(tapBytes);
+		HttpPost jsonPost = jsonPost(tapsPath);
+		jsonPost.setEntity(bae);
+		//Submit POST
+		try {
+			client.execute(jsonPost);
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
 	public static Vendor[] vendorsVisitedBy(Integer userID) {
 		URI visitedPath = pathWithID(ROOT + USERS, userID, VISITED);
 		InputStream stream = streamFrom(jsonGet(visitedPath));
@@ -107,7 +127,6 @@ public class TapTagAPI {
 		facebookUserInfoWrapper.setUser(facebookUserInfo);
 		
 		byte[] array = writeObjectToByteArray(facebookUserInfoWrapper);
-		String postBody = new String(array);
 		ByteArrayEntity bae = new ByteArrayEntity(array);
 		httpPost.setEntity(bae);
 		
@@ -285,6 +304,25 @@ public class TapTagAPI {
 
 		public void setProgress(Reward[] progress) {
 			this.progress = progress;
+		}
+	}
+	
+	@SuppressWarnings("serial")
+	public static class TapWrapper implements Serializable {
+		private Tap tap;
+		
+		public TapWrapper() {
+		}
+		
+		public TapWrapper(Tap tap) {
+			this.tap = tap;
+		}
+		
+		public Tap getTap() {
+			return tap;
+		}
+		public void setTap(Tap tap) {
+			this.tap = tap;
 		}
 	}
 
