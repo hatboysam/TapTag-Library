@@ -1,6 +1,7 @@
 package com.taptag.beta.tap;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonProperty;
@@ -15,11 +16,14 @@ public class Tap implements Serializable {
 	private Integer companyID;
 	@JsonProperty("user_id")
 	private Integer userID;
+	@JsonProperty("tapped_time")
+	private Date tappedTime;
 	
 	public Tap() {
 		vendorID = 0;
 		companyID = 0;
 		userID = 0;
+		tappedTime = new Date();
 	}
 	
 	//============================================================
@@ -45,6 +49,13 @@ public class Tap implements Serializable {
 	}
 	public void setUserID(Integer userID) {
 		this.userID = userID;
+	}
+
+	public Date getTappedTime() {
+		return tappedTime;
+	}
+	public void setTappedTime(Date tappedTime) {
+		this.tappedTime = tappedTime;
 	}
 	
 }

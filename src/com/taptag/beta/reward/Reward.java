@@ -15,7 +15,7 @@ public class Reward implements Serializable, Comparable<Reward> {
 		
 	}
 	
-	public Reward(String title, int progress, int total) {
+	public Reward(String title, String description, int progress, int total) {
 		this.name = title;
 		this.progress = progress;
 		this.total = total;
@@ -23,6 +23,14 @@ public class Reward implements Serializable, Comparable<Reward> {
 	
 	public Double score() {
 		return ((double) (progress / total));
+	}
+	
+	/**
+	 * Returns progress in the form "{progress}/{total}"
+	 * @return
+	 */
+	public String getProgressString() {
+		return (Integer.toString(progress) + "/" + Integer.toString(total));
 	}
 	
 	//============================================================

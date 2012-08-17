@@ -22,6 +22,7 @@ import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.annotate.JsonRootName;
 
 import com.taptag.beta.facebook.FacebookUserInfo;
+import com.taptag.beta.response.TapSubmitResponse;
 import com.taptag.beta.response.UserFetchResponse;
 import com.taptag.beta.reward.Reward;
 import com.taptag.beta.tap.Tap;
@@ -42,7 +43,7 @@ public class TapTagAPI {
 	public static String JSON = "application/json";
 	public static String JSON_END = ".json";
 
-	public static boolean submitTap(Integer userId, Vendor vendor) {
+	public static TapSubmitResponse submitTap(Integer userId, Vendor vendor) {
 		Tap tap = new Tap();
 		tap.setCompanyID(vendor.getCompanyId());
 		tap.setVendorID(vendor.getId());
@@ -55,11 +56,13 @@ public class TapTagAPI {
 		jsonPost.setEntity(bae);
 		//Submit POST
 		try {
-			client.execute(jsonPost);
-			return true;
+			ObjectMapper om = new ObjectMapper();
+			InputStream responseStream = streamFrom(jsonPost);
+			TapSubmitResponse tsr = om.readValue(responseStream, TapSubmitResponse.class);
+			return tsr;
 		} catch (Exception e) {
 			e.printStackTrace();
-			return false;
+			return new TapSubmitResponse();
 		}
 	}
 	
@@ -77,11 +80,18 @@ public class TapTagAPI {
 		}
 	}
 
-	public static Reward[] progressByUserAndCompany(Integer userID,
-			Integer companyID) {
-		String withParams = PROGRESS + "?company="
-				+ Integer.toString(companyID);
+	public static Reward[] progressByUserAndCompany(Integer userID, Integer companyID) {
+		String withParams = PROGRESS + "?company="+ Integer.toString(companyID);
 		URI progressPath = pathWithID(ROOT + USERS, userID, withParams);
+		return progressFromURI(progressPath);
+	}
+	
+	public static Reward[] progressByUser(Integer userID) {
+		URI progressPath = pathWithID(ROOT + USERS, userID, PROGRESS);
+		return progressFromURI(progressPath);
+	}
+	
+	private static Reward[] progressFromURI(URI progressPath) {
 		InputStream stream = streamFrom(jsonGet(progressPath));
 		ObjectMapper om = new ObjectMapper();
 		try {

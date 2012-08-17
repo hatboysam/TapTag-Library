@@ -75,7 +75,7 @@ public class NFCActions {
 		}
 		return (new NdefMessage(singleRecord));
 	}
-	
+
 	public static Vendor vendorFromNdef(NdefMessage message) {
 		NdefRecord[] records = message.getRecords();
 		NdefRecord vendorRecord = records[0];
@@ -94,7 +94,7 @@ public class NFCActions {
 		}
 		return vendor;
 	}
-	
+
 	/**
 	 * Create an NDEF record with TapTag's MIME type from a byte array
 	 * @param bytes
@@ -142,7 +142,7 @@ public class NFCActions {
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Overloaded.
 	 * Write a tag with a variable number of records
@@ -154,7 +154,7 @@ public class NFCActions {
 		NdefMessage message = NFCActions.stringAsNdef(messages);
 		return writeNdefToTag(tag, message);
 	}
-	
+
 	public static boolean writeTag(Tag tag, Vendor vendor) {
 		NdefMessage message = NFCActions.vendorAsNdef(vendor);
 		return writeNdefToTag(tag, message);
