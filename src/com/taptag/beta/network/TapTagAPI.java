@@ -22,6 +22,7 @@ import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.annotate.JsonRootName;
 
 import com.taptag.beta.facebook.FacebookUserInfo;
+import com.taptag.beta.location.LatLong;
 import com.taptag.beta.response.TapSubmitResponse;
 import com.taptag.beta.response.UserFetchResponse;
 import com.taptag.beta.reward.Reward;
@@ -40,6 +41,7 @@ public class TapTagAPI {
 	public static String VISITED = "/visited.json";
 	public static String PROGRESS = "/progress.json";
 	public static String FETCH = "/users/fetch.json";
+	public static String NEAR = "/vendors/near.json";
 	public static String JSON = "application/json";
 	public static String JSON_END = ".json";
 
@@ -71,8 +73,33 @@ public class TapTagAPI {
 		InputStream stream = streamFrom(jsonGet(visitedPath));
 		ObjectMapper om = new ObjectMapper();
 		try {
-			VendorsListWrapper vlw = om.readValue(stream,
-					VendorsListWrapper.class);
+			VendorsListWrapper vlw = om.readValue(stream, VendorsListWrapper.class);
+			return vlw.getVendorArray();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return (new Vendor[0]);
+		}
+	}
+	
+	public static Vendor[] allVendors() {
+		URI vendorsPath = combinePath(ROOT, VENDORS + ".json");
+		InputStream stream = streamFrom(jsonGet(vendorsPath));
+		ObjectMapper om = new ObjectMapper();
+		try {
+			VendorsListWrapper vlw = om.readValue(stream, VendorsListWrapper.class);
+			return vlw.getVendorArray();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return (new Vendor[0]);
+		}
+	}
+	
+	public static Vendor[] vendorsNear(LatLong location, Integer radius) {
+		URI nearPath = pathWithParams(HTTPS_ROOT, NEAR, nearParameters(location, radius));
+		InputStream stream = streamFrom(jsonGet(nearPath));
+		ObjectMapper om = new ObjectMapper();
+		try {
+			VendorsListWrapper vlw = om.readValue(stream, VendorsListWrapper.class);
 			return vlw.getVendorArray();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -171,6 +198,23 @@ public class TapTagAPI {
 			e.printStackTrace();
 			return null;
 		}
+	}
+	
+	public static URI pathWithParams(String root, String path, String params) {
+		String fullPath = root + path + params;
+		try {
+			URI result = new URI(fullPath);
+			return result;
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	public static String nearParameters(LatLong location, Integer radius) {
+		Double lat = location.getLat();
+		Double lng = location.getLng();
+		return "?lat=" + lat.toString() + "&lng=" + lng.toString() + "&radius=" + radius.toString();
 	}
 
 	public static HttpGet jsonGet(URI path) {

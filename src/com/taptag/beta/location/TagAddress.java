@@ -89,16 +89,16 @@ public class TagAddress implements Serializable {
 	
 	/**
 	 * Get the distance between two {lat, long} points
-	 * @param thisLatLong
-	 * @param thatLatLong
+	 * @param thisLL
+	 * @param thatLL
 	 * @return
 	 */
-	public static Double getDistance(Double[] thisLatLong, Double[] thatLatLong) {
-		if (thisLatLong == null || thatLatLong == null || thisLatLong.length < 2 || thatLatLong.length < 2) {
+	public static Double getDistance(LatLong thisLL, LatLong thatLL) {
+		if (thisLL == null || thatLL == null) {
 			return 0.0;
 		}
 		float[] result = new float[5];
-		Location.distanceBetween (thisLatLong[0], thisLatLong[1], thatLatLong[0], thatLatLong[1], result);
+		Location.distanceBetween (thisLL.getLat(), thisLL.getLng(), thatLL.getLat(), thatLL.getLng(), result);
 		return ((double) result[0]);
 	}
 	
