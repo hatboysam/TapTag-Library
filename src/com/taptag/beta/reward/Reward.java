@@ -30,7 +30,7 @@ public class Reward implements Serializable, Comparable<Reward> {
 	 * @return
 	 */
 	public String getProgressString() {
-		return (Integer.toString(progress) + "/" + Integer.toString(total));
+		return (Integer.toString(getProgressBounded()) + "/" + Integer.toString(total));
 	}
 	
 	//============================================================
@@ -63,6 +63,10 @@ public class Reward implements Serializable, Comparable<Reward> {
 
 	public int getProgress() {
 		return progress;
+	}
+	
+	public int getProgressBounded() {
+		return Math.min(progress, total);
 	}
 
 	public void setProgress(int progress) {

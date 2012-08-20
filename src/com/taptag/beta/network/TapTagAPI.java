@@ -40,6 +40,7 @@ public class TapTagAPI {
 	public static String VENDORS = "/vendors";
 	public static String VISITED = "/visited.json";
 	public static String PROGRESS = "/progress.json";
+	public static String COMPLETED = "/completed.json";
 	public static String FETCH = "/users/fetch.json";
 	public static String NEAR = "/vendors/near.json";
 	public static String JSON = "application/json";
@@ -116,6 +117,19 @@ public class TapTagAPI {
 	public static Reward[] progressByUser(Integer userID) {
 		URI progressPath = pathWithID(ROOT + USERS, userID, PROGRESS);
 		return progressFromURI(progressPath);
+	}
+	
+	public static Reward[] completedByUser(Integer userID) {
+		URI completedPath = pathWithID(ROOT + USERS, userID, COMPLETED);
+		InputStream stream = streamFrom(jsonGet(completedPath));
+		ObjectMapper om = new ObjectMapper();
+		try {
+			CompletedWrapper cw = om.readValue(stream, CompletedWrapper.class);
+			return cw.getCompleted();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new Reward[0];
+		}
 	}
 	
 	private static Reward[] progressFromURI(URI progressPath) {
@@ -322,7 +336,6 @@ public class TapTagAPI {
 		public FacebookUserInfo getUser() {
 			return user;
 		}
-
 		public void setUser(FacebookUserInfo user) {
 			this.user = user;
 		}
@@ -335,11 +348,9 @@ public class TapTagAPI {
 		public VendorWrapper() {
 			vendor = null;
 		}
-
 		public Vendor getVendor() {
 			return vendor;
 		}
-
 		public void setVendor(Vendor vendor) {
 			this.vendor = vendor;
 		}
@@ -351,13 +362,25 @@ public class TapTagAPI {
 		public ProgressWrapper() {
 			progress = new Reward[0];
 		}
-
 		public Reward[] getProgress() {
 			return progress;
 		}
-
 		public void setProgress(Reward[] progress) {
 			this.progress = progress;
+		}
+	}
+	
+	public static class CompletedWrapper {
+		private Reward[] completed;
+		
+		public CompletedWrapper() {
+			completed = new Reward[0];
+		}
+		public Reward[] getCompleted() {
+			return completed;
+		}
+		public void setCompleted(Reward[] completed) {
+			this.completed = completed;
 		}
 	}
 	
@@ -367,11 +390,9 @@ public class TapTagAPI {
 		
 		public TapWrapper() {
 		}
-		
 		public TapWrapper(Tap tap) {
 			this.tap = tap;
-		}
-		
+		}	
 		public Tap getTap() {
 			return tap;
 		}
