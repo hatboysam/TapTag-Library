@@ -1,15 +1,18 @@
 package com.taptag.beta.reward;
 
 import java.io.Serializable;
+import java.util.Date;
 
 @SuppressWarnings("serial")
 public class Reward implements Serializable, Comparable<Reward> {
-
+	
 	private Integer id;
 	private String name;
 	private String description;
 	private int progress;
 	private int total;
+	private boolean repeats;
+	private Date end_date;
 
 	public Reward() {
 		
@@ -17,8 +20,10 @@ public class Reward implements Serializable, Comparable<Reward> {
 	
 	public Reward(String title, String description, int progress, int total) {
 		this.name = title;
+		this.description = description;
 		this.progress = progress;
 		this.total = total;
+		this.repeats = false;
 	}
 	
 	public Double score() {
@@ -31,6 +36,15 @@ public class Reward implements Serializable, Comparable<Reward> {
 	 */
 	public String getProgressString() {
 		return (Integer.toString(getProgressBounded()) + "/" + Integer.toString(total));
+	}
+	
+	/**
+	 * Determines if a reward ends before today
+	 * @return
+	 */
+	public boolean isExpired() {
+		int compare = end_date.compareTo(new Date());
+		return (compare < 0);
 	}
 	
 	//============================================================
@@ -79,6 +93,22 @@ public class Reward implements Serializable, Comparable<Reward> {
 
 	public void setTotal(int total) {
 		this.total = total;
+	}
+	
+	public boolean getRepeats() {
+		return repeats;
+	}
+
+	public void setRepeats(boolean repeats) {
+		this.repeats = repeats;
+	}
+
+	public Date getEnd_date() {
+		return end_date;
+	}
+
+	public void setEnd_date(Date end_date) {
+		this.end_date = end_date;
 	}
 
 	@Override

@@ -6,6 +6,8 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.SimpleDateFormat;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -32,7 +34,8 @@ import com.taptag.beta.vendor.Vendor;
 public class TapTagAPI {
 
 	public static HttpClient client = new DefaultHttpClient();
-
+	public static SimpleDateFormat rewardDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+	
 	public static String ROOT = "http://taptag.herokuapp.com";
 	public static String HTTPS_ROOT = "https://taptag.herokuapp.com";
 	public static String USERS = "/users";
@@ -123,6 +126,7 @@ public class TapTagAPI {
 		URI completedPath = pathWithID(ROOT + USERS, userID, COMPLETED);
 		InputStream stream = streamFrom(jsonGet(completedPath));
 		ObjectMapper om = new ObjectMapper();
+		om.setDateFormat(rewardDateFormat);
 		try {
 			CompletedWrapper cw = om.readValue(stream, CompletedWrapper.class);
 			return cw.getCompleted();
@@ -135,6 +139,7 @@ public class TapTagAPI {
 	private static Reward[] progressFromURI(URI progressPath) {
 		InputStream stream = streamFrom(jsonGet(progressPath));
 		ObjectMapper om = new ObjectMapper();
+		om.setDateFormat(rewardDateFormat);
 		try {
 			ProgressWrapper pw = om.readValue(stream, ProgressWrapper.class);
 			return pw.getProgress();
