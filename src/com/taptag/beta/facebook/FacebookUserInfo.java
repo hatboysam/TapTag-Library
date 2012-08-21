@@ -18,6 +18,13 @@ public class FacebookUserInfo implements Comparable<FacebookUserInfo>, Serializa
 	
 	public FacebookUserInfo(){	
 	}
+	
+	public FacebookUserInfo(String first_name, String last_name, String email) {
+		this.first_name = first_name;
+		this.last_name = last_name;
+		this.email = email;
+		this.id = 999999;
+	}
 
 	public int compareTo(FacebookUserInfo arg0) {
 		String thisEmail = this.getEmail();
