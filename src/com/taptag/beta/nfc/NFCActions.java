@@ -24,7 +24,7 @@ import android.widget.Toast;
 public class NFCActions {
 
 	private static final String TAG = "TapTag";
-	private static final String TAG_MIME = "application/com.taptag.tag";
+	public static final String TAG_MIME = "application/com.taptag.tag";
 
 	/**
 	 * Convert a string to a writeable NdefMessage (single NdefRecord)

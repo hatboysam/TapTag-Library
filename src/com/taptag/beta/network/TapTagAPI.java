@@ -25,6 +25,8 @@ import org.codehaus.jackson.map.annotate.JsonRootName;
 
 import com.taptag.beta.facebook.FacebookUserInfo;
 import com.taptag.beta.location.LatLong;
+import com.taptag.beta.redemption.Redemption;
+import com.taptag.beta.response.RedemptionResponse;
 import com.taptag.beta.response.TapSubmitResponse;
 import com.taptag.beta.response.UserFetchResponse;
 import com.taptag.beta.reward.Reward;
@@ -41,9 +43,11 @@ public class TapTagAPI {
 	public static String USERS = "/users";
 	public static String TAPS = "/taps";
 	public static String VENDORS = "/vendors";
+	public static String REDEMPTIONS = "/redemptions";
 	public static String VISITED = "/visited.json";
 	public static String PROGRESS = "/progress.json";
 	public static String COMPLETED = "/completed.json";
+	public static String REDEEMED = "/redeemed.json";
 	public static String FETCH = "/users/fetch.json";
 	public static String NEAR = "/vendors/near.json";
 	public static String JSON = "application/json";
@@ -136,6 +140,20 @@ public class TapTagAPI {
 		}
 	}
 	
+	public static Reward[] redeemedByUser(Integer userID) {
+		URI completedPath = pathWithID(ROOT + USERS, userID, REDEEMED);
+		InputStream stream = streamFrom(jsonGet(completedPath));
+		ObjectMapper om = new ObjectMapper();
+		om.setDateFormat(rewardDateFormat);
+		try {
+			RedeemedWrapper cw = om.readValue(stream, RedeemedWrapper.class);
+			return cw.getRedeemed();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new Reward[0];
+		}
+	}
+	
 	private static Reward[] progressFromURI(URI progressPath) {
 		InputStream stream = streamFrom(jsonGet(progressPath));
 		ObjectMapper om = new ObjectMapper();
@@ -194,6 +212,24 @@ public class TapTagAPI {
 			return (new UserFetchResponse());
 		}
 		
+	}
+	
+	public static RedemptionResponse redeemReward(Redemption toSubmit) {
+		URI redeemPath = combinePath(HTTPS_ROOT, REDEMPTIONS);
+		HttpPost httpPost = jsonPost(redeemPath);
+		ObjectMapper om = new ObjectMapper();
+		
+		byte[] array = writeObjectToByteArray(toSubmit);
+		ByteArrayEntity bae = new ByteArrayEntity(array);
+		httpPost.setEntity(bae);
+		
+		InputStream responseStream = streamFrom(httpPost);
+		try {
+			RedemptionResponse response = om.readValue(responseStream, RedemptionResponse.class);
+			return response;
+		} catch (Exception e) {
+			return (new RedemptionResponse());
+		}
 	}
 
 	public static URI pathWithID(String prefix, Integer id, String suffix) {
@@ -389,6 +425,20 @@ public class TapTagAPI {
 		}
 	}
 	
+	public static class RedeemedWrapper {
+		private Reward[] redeemed;
+		
+		public RedeemedWrapper() {
+			redeemed = new Reward[0];
+		}
+		public Reward[] getRedeemed() {
+			return redeemed;
+		}
+		public void setRedeemed(Reward[] redeemed) {
+			this.redeemed = redeemed;
+		}
+	}
+	
 	@SuppressWarnings("serial")
 	public static class TapWrapper implements Serializable {
 		private Tap tap;
@@ -403,6 +453,23 @@ public class TapTagAPI {
 		}
 		public void setTap(Tap tap) {
 			this.tap = tap;
+		}
+	}
+	
+	@SuppressWarnings("serial")
+	public static class RedemptionWrapper implements Serializable {
+		private Redemption redemption;
+		
+		public RedemptionWrapper(){
+		}
+		public RedemptionWrapper(Redemption redemption){
+			this.redemption = redemption;
+		}
+		public Redemption getRedemption() {
+			return redemption;
+		}
+		public void setRedemption(Redemption redemption){
+			this.redemption = redemption;
 		}
 	}
 

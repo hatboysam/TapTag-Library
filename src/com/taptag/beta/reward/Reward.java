@@ -7,6 +7,7 @@ import java.util.Date;
 public class Reward implements Serializable, Comparable<Reward> {
 	
 	private Integer id;
+	private Integer company_id;
 	private String name;
 	private String description;
 	private int progress;
@@ -57,6 +58,13 @@ public class Reward implements Serializable, Comparable<Reward> {
 
 	public void setId(Integer id) {
 		this.id = id;
+	}
+
+	public Integer getCompany_id() {
+		return company_id;
+	}
+	public void setCompany_id(Integer company_id) {
+		this.company_id = company_id;
 	}
 
 	public String getName() {
